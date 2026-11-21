@@ -1,0 +1,710 @@
+{
+  "info": {
+    "_postman_id": "d8577efc-1800-45f7-af7a-a6244fb17b01",
+    "name": "ms-reservas · pruebas locales (Thunder Client)",
+    "description": "Variables de entorno: url_login, url_reservas, admin_email, admin_password, user_email, user_password, token_admin, token_user, id_creado. No guardar claves ni tokens en el repositorio.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "00a · Login administrador → 200 (copiar token a token_admin)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{url_login}}",
+          "host": [
+            "{{url_login}}"
+          ],
+          "path": []
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\": \"{{admin_email}}\", \"password\": \"{{admin_password}}\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Codigo esperado 200', function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "00b · Login usuario no administrador → 200 (copiar token a token_user)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{url_login}}",
+          "host": [
+            "{{url_login}}"
+          ],
+          "path": []
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\": \"{{user_email}}\", \"password\": \"{{user_password}}\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Codigo esperado 200', function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "01 · GET sin token → 401",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{url_reservas}}",
+          "host": [
+            "{{url_reservas}}"
+          ],
+          "path": []
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Codigo esperado 401', function () { pm.response.to.have.status(401); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 · GET listar con token_admin → 200",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_admin}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{url_reservas}}",
+          "host": [
+            "{{url_reservas}}"
+          ],
+          "path": []
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Codigo esperado 200', function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 · GET listar con token_user → 200",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_user}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{url_reservas}}",
+          "host": [
+            "{{url_reservas}}"
+          ],
+          "path": []
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Codigo esperado 200', function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 · GET por id (1) → 200",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_admin}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{url_reservas}}/1",
+          "host": [
+            "{{url_reservas}}"
+          ],
+          "path": [
+            "1"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Codigo esperado 200', function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 · GET id inexistente (9999) → 404",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_admin}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{url_reservas}}/9999",
+          "host": [
+            "{{url_reservas}}"
+          ],
+          "path": [
+            "9999"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Codigo esperado 404', function () { pm.response.to.have.status(404); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 · GET filtro ?huesped= → 200",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_admin}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{url_reservas}}?huesped=Carlos%20Ramirez",
+          "host": [
+            "{{url_reservas}}"
+          ],
+          "path": [],
+          "query": [
+            {
+              "key": "huesped",
+              "value": "Carlos%20Ramirez"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Codigo esperado 200', function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 · POST crear válido → 201 (copiar id a id_creado)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_admin}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{url_reservas}}",
+          "host": [
+            "{{url_reservas}}"
+          ],
+          "path": []
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"codigo\": \"RES-100\", \"huesped\": \"Prueba Uno\", \"fecha_entrada\": \"2026-12-01\", \"fecha_salida\": \"2026-12-03\", \"personas\": 2}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Codigo esperado 201', function () { pm.response.to.have.status(201); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 · POST codigo repetido → 409",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_admin}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{url_reservas}}",
+          "host": [
+            "{{url_reservas}}"
+          ],
+          "path": []
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"codigo\": \"RES-100\", \"huesped\": \"Prueba Uno\", \"fecha_entrada\": \"2026-12-01\", \"fecha_salida\": \"2026-12-03\", \"personas\": 2}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Codigo esperado 409', function () { pm.response.to.have.status(409); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "09 · POST fecha_salida no posterior a fecha_entrada → 400",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_admin}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{url_reservas}}",
+          "host": [
+            "{{url_reservas}}"
+          ],
+          "path": []
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"codigo\": \"RES-101\", \"huesped\": \"Prueba Uno\", \"fecha_entrada\": \"2026-12-05\", \"fecha_salida\": \"2026-12-05\", \"personas\": 2}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Codigo esperado 400', function () { pm.response.to.have.status(400); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "10 · POST personas = 0 → 400",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_admin}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{url_reservas}}",
+          "host": [
+            "{{url_reservas}}"
+          ],
+          "path": []
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"codigo\": \"RES-102\", \"huesped\": \"Prueba Uno\", \"fecha_entrada\": \"2026-12-01\", \"fecha_salida\": \"2026-12-03\", \"personas\": 0}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Codigo esperado 400', function () { pm.response.to.have.status(400); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "11 · POST sin campo huesped → 400",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_admin}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{url_reservas}}",
+          "host": [
+            "{{url_reservas}}"
+          ],
+          "path": []
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"codigo\": \"RES-103\", \"fecha_entrada\": \"2026-12-01\", \"fecha_salida\": \"2026-12-03\", \"personas\": 2}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Codigo esperado 400', function () { pm.response.to.have.status(400); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "12 · POST con token_user (no admin) → 403",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_user}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{url_reservas}}",
+          "host": [
+            "{{url_reservas}}"
+          ],
+          "path": []
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"codigo\": \"RES-104\", \"huesped\": \"Prueba Uno\", \"fecha_entrada\": \"2026-12-01\", \"fecha_salida\": \"2026-12-03\", \"personas\": 2}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Codigo esperado 403', function () { pm.response.to.have.status(403); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "13 · PUT actualizar {{id_creado}} → 200",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_admin}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{url_reservas}}/{{id_creado}}",
+          "host": [
+            "{{url_reservas}}"
+          ],
+          "path": [
+            "{{id_creado}}"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"codigo\": \"RES-100\", \"huesped\": \"Prueba Uno Editada\", \"fecha_entrada\": \"2026-12-01\", \"fecha_salida\": \"2026-12-03\", \"personas\": 3}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Codigo esperado 200', function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "14 · PUT id inexistente (9999) → 404",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_admin}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{url_reservas}}/9999",
+          "host": [
+            "{{url_reservas}}"
+          ],
+          "path": [
+            "9999"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"codigo\": \"RES-100\", \"huesped\": \"Prueba Uno Editada\", \"fecha_entrada\": \"2026-12-01\", \"fecha_salida\": \"2026-12-03\", \"personas\": 3}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Codigo esperado 404', function () { pm.response.to.have.status(404); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "15 · DELETE {{id_creado}} → 204",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_admin}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{url_reservas}}/{{id_creado}}",
+          "host": [
+            "{{url_reservas}}"
+          ],
+          "path": [
+            "{{id_creado}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Codigo esperado 204', function () { pm.response.to.have.status(204); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "16 · DELETE otra vez el mismo → 404",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_admin}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{url_reservas}}/{{id_creado}}",
+          "host": [
+            "{{url_reservas}}"
+          ],
+          "path": [
+            "{{id_creado}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Codigo esperado 404', function () { pm.response.to.have.status(404); });"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
