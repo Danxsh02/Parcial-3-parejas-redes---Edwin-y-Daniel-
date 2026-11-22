@@ -1,0 +1,633 @@
+{
+  "info": {
+    "name": "ms-reservas - Evaluación M3 (preparación)",
+    "description": "Login en ms-usuarios y casos de cada código de ms-reservas. Ejecutar en orden con el Runner. Variables de la colección: base, base_usuarios, email, password.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base",
+      "value": "http://127.0.0.1:3011"
+    },
+    {
+      "key": "base_usuarios",
+      "value": "http://127.0.0.1:3001"
+    },
+    {
+      "key": "email",
+      "value": "admin@empresa.com"
+    },
+    {
+      "key": "password",
+      "value": "Admin2026*"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "codigo_nuevo",
+      "value": ""
+    },
+    {
+      "key": "id_nuevo",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "00 Login administrador (ms-usuarios) → 200",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_usuarios}}/usuarios/login",
+          "host": [
+            "{{base_usuarios}}"
+          ],
+          "path": [
+            "usuarios",
+            "login"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "auth": {
+          "type": "noauth"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
+              "const r = pm.response.json();",
+              "pm.test(\"Trae token\", () => pm.expect(r.token).to.be.a(\"string\"));",
+              "pm.collectionVariables.set(\"token\", r.token);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "01 Listar sin token → 401",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base}}/reservas",
+          "host": [
+            "{{base}}"
+          ],
+          "path": [
+            "reservas"
+          ]
+        },
+        "auth": {
+          "type": "noauth"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 401\", () => pm.response.to.have.status(401));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 Listar reservas → 200",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base}}/reservas",
+          "host": [
+            "{{base}}"
+          ],
+          "path": [
+            "reservas"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"Es un arreglo con al menos 3\", () => pm.expect(pm.response.json()).to.be.an(\"array\").with.length.at.least(3));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 Filtro ?huesped= → 200",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base}}/reservas?huesped=Carlos Ramirez",
+          "host": [
+            "{{base}}"
+          ],
+          "path": [
+            "reservas"
+          ],
+          "query": [
+            {
+              "key": "huesped",
+              "value": "Carlos Ramirez"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
+              "const r = pm.response.json();",
+              "pm.test(\"Solo reservas de Carlos Ramirez\", () => { pm.expect(r.length).to.be.above(0); r.forEach(x => pm.expect(x.huesped).to.eql(\"Carlos Ramirez\")); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 Obtener por id → 200",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base}}/reservas/1",
+          "host": [
+            "{{base}}"
+          ],
+          "path": [
+            "reservas",
+            "1"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"Es la reserva 1\", () => pm.expect(pm.response.json().id).to.eql(1));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 Obtener id inexistente → 404",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base}}/reservas/999999",
+          "host": [
+            "{{base}}"
+          ],
+          "path": [
+            "reservas",
+            "999999"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 404\", () => pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 Obtener id no numérico → 400",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base}}/reservas/abc",
+          "host": [
+            "{{base}}"
+          ],
+          "path": [
+            "reservas",
+            "abc"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 400\", () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 Crear reserva → 201",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base}}/reservas",
+          "host": [
+            "{{base}}"
+          ],
+          "path": [
+            "reservas"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"codigo\": \"{{codigo_nuevo}}\",\n  \"huesped\": \"Luis Pérez\",\n  \"fecha_entrada\": \"2026-12-15\",\n  \"fecha_salida\": \"2026-12-18\",\n  \"personas\": 2\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.collectionVariables.set(\"codigo_nuevo\", \"RES-T\" + Date.now());"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 201\", () => pm.response.to.have.status(201));",
+              "const r = pm.response.json();",
+              "pm.collectionVariables.set(\"id_nuevo\", r.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 Crear con código repetido → 409",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base}}/reservas",
+          "host": [
+            "{{base}}"
+          ],
+          "path": [
+            "reservas"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"codigo\": \"{{codigo_nuevo}}\",\n  \"huesped\": \"Otro Huésped\",\n  \"fecha_entrada\": \"2026-12-15\",\n  \"fecha_salida\": \"2026-12-18\",\n  \"personas\": 1\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 409\", () => pm.response.to.have.status(409));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "09 Crear con salida no posterior a entrada → 400",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base}}/reservas",
+          "host": [
+            "{{base}}"
+          ],
+          "path": [
+            "reservas"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"codigo\": \"RES-ERR-1\",\n  \"huesped\": \"Luis Pérez\",\n  \"fecha_entrada\": \"2026-12-18\",\n  \"fecha_salida\": \"2026-12-15\",\n  \"personas\": 2\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 400\", () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "10 Crear con personas = 0 y fecha inválida → 400",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base}}/reservas",
+          "host": [
+            "{{base}}"
+          ],
+          "path": [
+            "reservas"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"codigo\": \"RES-ERR-2\",\n  \"huesped\": \"Luis Pérez\",\n  \"fecha_entrada\": \"2026-02-30\",\n  \"fecha_salida\": \"2026-03-02\",\n  \"personas\": 0\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 400\", () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "11 Actualizar reserva → 200",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base}}/reservas/{{id_nuevo}}",
+          "host": [
+            "{{base}}"
+          ],
+          "path": [
+            "reservas",
+            "{{id_nuevo}}"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"codigo\": \"{{codigo_nuevo}}\",\n  \"huesped\": \"Luis Pérez\",\n  \"fecha_entrada\": \"2026-12-15\",\n  \"fecha_salida\": \"2026-12-20\",\n  \"personas\": 3\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"Quedó con 3 personas\", () => pm.expect(pm.response.json().personas).to.eql(3));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "12 Actualizar con código de otra reserva → 409",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base}}/reservas/{{id_nuevo}}",
+          "host": [
+            "{{base}}"
+          ],
+          "path": [
+            "reservas",
+            "{{id_nuevo}}"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"codigo\": \"RES-001\",\n  \"huesped\": \"Luis Pérez\",\n  \"fecha_entrada\": \"2026-12-15\",\n  \"fecha_salida\": \"2026-12-20\",\n  \"personas\": 3\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 409\", () => pm.response.to.have.status(409));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "13 Actualizar id inexistente → 404",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base}}/reservas/999999",
+          "host": [
+            "{{base}}"
+          ],
+          "path": [
+            "reservas",
+            "999999"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"codigo\": \"RES-X\",\n  \"huesped\": \"Luis Pérez\",\n  \"fecha_entrada\": \"2026-12-15\",\n  \"fecha_salida\": \"2026-12-20\",\n  \"personas\": 3\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 404\", () => pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "14 Eliminar reserva → 204",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{base}}/reservas/{{id_nuevo}}",
+          "host": [
+            "{{base}}"
+          ],
+          "path": [
+            "reservas",
+            "{{id_nuevo}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 204\", () => pm.response.to.have.status(204));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "15 Eliminar de nuevo (ya no existe) → 404",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{base}}/reservas/{{id_nuevo}}",
+          "host": [
+            "{{base}}"
+          ],
+          "path": [
+            "reservas",
+            "{{id_nuevo}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 404\", () => pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
