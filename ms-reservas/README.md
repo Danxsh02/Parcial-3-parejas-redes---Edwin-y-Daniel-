@@ -55,59 +55,10 @@ Errores: `{ "error": "mensaje" }`.
 }
 ```
 
-## Pruebas (Thunder Client y Postman)
+## Pruebas
 
-En `docs/` hay dos colecciones en formato Postman v2.1. Las dos se importan en Thunder Client
-(Collections → menú → Import) o en Postman (Import). Antes de probar deben estar corriendo
-ms-usuarios (puerto 3001) y ms-reservas (puerto 3011), con la **misma `JWT_SECRET`** en los dos `.env`.
-
-| Archivo | Para qué | Casos |
-| --- | --- | --- |
-| `docs/thunder-collection_ms-reservas.json` | Prueba manual paso a paso en Thunder Client, con un usuario administrador y uno no administrador | 18: 200, 201, 204, 400, 401, **403**, 404 y 409 |
-| `docs/ms-reservas.postman_collection.json` | Ejecución automática con el Runner (Postman o Thunder Client): guarda el token y el id solo | 16: 200, 201, 204, 400, 401, 404 y 409 |
-
-### Colección de Thunder Client (`thunder-collection_ms-reservas.json`)
-
-1. Crear un entorno (Env) con estas variables:
-
-   | Variable | Valor |
-   | --- | --- |
-   | `url_login` | `http://127.0.0.1:3001/usuarios/login` |
-   | `url_reservas` | `http://127.0.0.1:3011/reservas` |
-   | `admin_email` / `admin_password` | Administrador de su ms-usuarios (por defecto `admin@empresa.com` / `Admin2026*`) |
-   | `user_email` / `user_password` | Un usuario con rol distinto de administrador (por ejemplo `comercial`) |
-   | `token_admin`, `token_user`, `id_creado` | Vacías: se llenan durante la prueba |
-
-2. Ejecutar `00a` y copiar el `token` de la respuesta en `token_admin`; ejecutar `00b` y copiarlo en `token_user`.
-3. Ejecutar `07` (POST 201) y copiar el `id` de la respuesta en `id_creado`.
-4. Ejecutar el resto en orden. `12` demuestra el **403**: el usuario no administrador no puede crear.
-
-Si su ms-usuarios no tiene un usuario no administrador, créelo con el token de administrador:
-`POST http://127.0.0.1:3001/usuarios` con
-`{"nombre":"Laura Gómez","email":"laura@agrored.com","rol":"comercial","password":"Comercial2026*"}`
-(el rol debe estar en `ROLES` del `.env` de ms-usuarios).
-
-### Colección automática (`ms-reservas.postman_collection.json`)
-
-1. Importarla y revisar las variables de la colección: `base` (`http://127.0.0.1:3011`),
-   `base_usuarios` (`http://127.0.0.1:3001`), `email` y `password` del administrador.
-2. Run collection → Run. Resultado esperado: **16 peticiones y 21 pruebas aprobadas**.
-   El filtro se prueba con `?huesped=Carlos Ramirez` (registros iniciales de `db/schema.sql`).
-
-Ninguna colección guarda claves ni tokens en el repositorio: se ponen en el entorno o en las variables locales.
-
-## Despliegue (referencia para el examen)
-
-ms-reservas **no** se despliega en las VMs antes del examen. El día de la evaluación (persona 2):
-
-| Archivo | Uso |
-| --- | --- |
-| `deploy/ms-reservas.service` | Unidad de systemd: usuario `nodeapps`, `WorkingDirectory=/srv/m3examen/app/ms-reservas` |
-| `deploy/correa-munoz.conf` | Host virtual `correa-munoz.m3examen.com`: frontend en `/var/www/correa-munoz` y rutas `/api/usuarios` y `/api/reservas` |
-
-Pasos resumidos en servidor2: clonar el repositorio en `/srv/m3examen/app`, `npm ci --omit=dev` en `ms-reservas`,
-crear el `.env` (`DB_HOST=172.16.1.58`) con `chmod 640` y grupo `nodeapps`, copiar la unidad, `systemctl enable --now ms-reservas`,
-copiar y activar el host virtual, y agregar `correa-munoz IN A 172.16.1.59` en la zona `m3examen.com` de servidor1.
+`docs/ms-reservas.postman_collection.json` (Postman v2.1): login admin y usuario normal + casos de
+200, 201, 204, 400, 401, 403, 404 y 409. Ajustar las variables de la colección (`adminEmail`, etc.).
 
 ## Registro de peticiones
 
