@@ -1,6 +1,6 @@
 const pool = require('../config/db');
 
-const COLUMNAS = 'id, codigo, huesped, fecha_entrada, fecha_salida, personas';
+const COLUMNAS = 'id, codigo, huesped, fecha_entrada, fecha_salida, personas, habitacion_id';
 
 async function findAll({ huesped } = {}) {
   if (huesped) {
@@ -26,21 +26,21 @@ async function findByCodigo(codigo) {
 
 async function create(d) {
   const [result] = await pool.query(
-    'INSERT INTO reservas (codigo, huesped, fecha_entrada, fecha_salida, personas) VALUES (?, ?, ?, ?, ?)',
-    [d.codigo, d.huesped, d.fecha_entrada, d.fecha_salida, d.personas]
+    'INSERT INTO reservas (codigo, huesped, fecha_entrada, fecha_salida, personas, habitacion_id) VALUES (?, ?, ?, ?, ?, ?)',
+    [d.codigo, d.huesped, d.fecha_entrada, d.fecha_salida, d.personas, d.habitacion_id]
   );
   return result.insertId;
 }
 
 async function update(id, d) {
   const [result] = await pool.query(
-    'UPDATE reservas SET codigo = ?, huesped = ?, fecha_entrada = ?, fecha_salida = ?, personas = ? WHERE id = ?',
-    [d.codigo, d.huesped, d.fecha_entrada, d.fecha_salida, d.personas, id]
+    'UPDATE reservas SET codigo = ?, huesped = ?, fecha_entrada = ?, fecha_salida = ?, personas = ?, habitacion_id = ? WHERE id = ?',
+    [d.codigo, d.huesped, d.fecha_entrada, d.fecha_salida, d.personas, d.habitacion_id, id]
   );
   return result.affectedRows > 0;
 }
 
-async function remove(id) {
+async function remove(id) { 
   const [result] = await pool.query('DELETE FROM reservas WHERE id = ?', [id]);
   return result.affectedRows > 0;
 }

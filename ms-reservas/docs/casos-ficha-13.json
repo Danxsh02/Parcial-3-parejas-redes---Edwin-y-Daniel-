@@ -1,0 +1,192 @@
+{
+  "info": {
+    "name": "Ficha 13 - ms-reservas",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "00 Login Admin",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "http://127.0.0.1:3001/usuarios/login",
+          "protocol": "http",
+          "host": ["127", "0", "0", "1"],
+          "port": "3001",
+          "path": ["usuarios", "login"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"admin@empresa.com\",\n  \"password\": \"Admin2026*\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "pm.environment.set('token_admin', jsonData.token);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "01 POST habitacion_id 3",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token_admin}}" }
+        ],
+        "url": {
+          "raw": "http://127.0.0.1:3011/reservas",
+          "protocol": "http",
+          "host": ["127", "0", "0", "1"],
+          "port": "3011",
+          "path": ["reservas"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"codigo\": \"RS-501-3\",\n  \"huesped\": \"Laura Ospina\",\n  \"fecha_entrada\": \"2026-12-20\",\n  \"fecha_salida\": \"2026-12-23\",\n  \"personas\": 3,\n  \"habitacion_id\": 3\n}"
+        }
+      }
+    },
+    {
+      "name": "02 POST habitacion_id 99",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token_admin}}" }
+        ],
+        "url": {
+          "raw": "http://127.0.0.1:3011/reservas",
+          "protocol": "http",
+          "host": ["127", "0", "0", "1"],
+          "port": "3011",
+          "path": ["reservas"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"codigo\": \"RS-501-99\",\n  \"huesped\": \"Otro Huesped\",\n  \"fecha_entrada\": \"2026-12-20\",\n  \"fecha_salida\": \"2026-12-23\",\n  \"personas\": 2,\n  \"habitacion_id\": 99\n}"
+        }
+      }
+    },
+    {
+      "name": "03 POST supera capacidad",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token_admin}}" }
+        ],
+        "url": {
+          "raw": "http://127.0.0.1:3011/reservas",
+          "protocol": "http",
+          "host": ["127", "0", "0", "1"],
+          "port": "3011",
+          "path": ["reservas"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"codigo\": \"RS-501-1\",\n  \"huesped\": \"Laura Ospina\",\n  \"fecha_entrada\": \"2026-12-20\",\n  \"fecha_salida\": \"2026-12-23\",\n  \"personas\": 3,\n  \"habitacion_id\": 1\n}"
+        }
+      }
+    },
+    {
+      "name": "04 PUT supera capacidad",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token_admin}}" }
+        ],
+        "url": {
+          "raw": "http://127.0.0.1:3011/reservas/1",
+          "protocol": "http",
+          "host": ["127", "0", "0", "1"],
+          "port": "3011",
+          "path": ["reservas", "1"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"codigo\": \"RES-001\",\n  \"huesped\": \"Carlos Ramirez\",\n  \"fecha_entrada\": \"2026-12-01\",\n  \"fecha_salida\": \"2026-12-05\",\n  \"personas\": 3,\n  \"habitacion_id\": 1\n}"
+        }
+      }
+    },
+    {
+      "name": "05 GET reserva 1",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token_admin}}" }
+        ],
+        "url": {
+          "raw": "http://127.0.0.1:3011/reservas/1",
+          "protocol": "http",
+          "host": ["127", "0", "0", "1"],
+          "port": "3011",
+          "path": ["reservas", "1"]
+        }
+      }
+    },
+    {
+      "name": "06 GET listado",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token_admin}}" }
+        ],
+        "url": {
+          "raw": "http://127.0.0.1:3011/reservas",
+          "protocol": "http",
+          "host": ["127", "0", "0", "1"],
+          "port": "3011",
+          "path": ["reservas"]
+        }
+      }
+    },
+    {
+      "name": "07 GET listado (caido)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token_admin}}" }
+        ],
+        "url": {
+          "raw": "http://127.0.0.1:3011/reservas",
+          "protocol": "http",
+          "host": ["127", "0", "0", "1"],
+          "port": "3011",
+          "path": ["reservas"]
+        }
+      }
+    },
+    {
+      "name": "08 POST (caido)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token_admin}}" }
+        ],
+        "url": {
+          "raw": "http://127.0.0.1:3011/reservas",
+          "protocol": "http",
+          "host": ["127", "0", "0", "1"],
+          "port": "3011",
+          "path": ["reservas"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"codigo\": \"RS-501-8\",\n  \"huesped\": \"Laura Ospina\",\n  \"fecha_entrada\": \"2026-12-20\",\n  \"fecha_salida\": \"2026-12-23\",\n  \"personas\": 3,\n  \"habitacion_id\": 3\n}"
+        }
+      }
+    }
+  ]
+}
