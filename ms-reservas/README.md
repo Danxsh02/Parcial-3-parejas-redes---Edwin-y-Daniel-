@@ -10,12 +10,10 @@ Arquitectura: `routes → controller → service → repository`, con `models/re
 
 ## Instalación
 
-```bash
 npm install
 cp .env.example .env        # y completar valores
 mysql -u root -p < db/schema.sql
 npm start
-```
 
 ## Modelo `reserva`
 
@@ -27,6 +25,7 @@ npm start
 | fecha_entrada | fecha `AAAA-MM-DD` | obligatoria, fecha real |
 | fecha_salida | fecha `AAAA-MM-DD` | obligatoria, **posterior** a fecha_entrada (400) |
 | personas | entero | mayor que 0 |
+| habitacion_id | entero | positivo, obligatorio. Referencia a `ms-habitaciones` |
 
 ## Contrato
 
@@ -37,23 +36,31 @@ Base: `/reservas`
 | GET | `/reservas` | cualquiera | 200 lista | 401 |
 | GET | `/reservas?huesped=Nombre` | cualquiera | 200 lista filtrada (coincidencia exacta) | 401 |
 | GET | `/reservas/:id` | cualquiera | 200 | 400 id inválido, 401, 404 |
-| POST | `/reservas` | administrador | 201 reserva creada | 400, 401, 403, 409 |
-| PUT | `/reservas/:id` | administrador | 200 reserva actualizada (reemplazo completo) | 400, 401, 403, 404, 409 |
+| POST | `/reservas` | administrador | 201 reserva creada | 400, 401, 403, 409, 503 |
+| PUT | `/reservas/:id` | administrador | 200 reserva actualizada (reemplazo completo) | 400, 401, 403, 404, 409, 503 |
 | DELETE | `/reservas/:id` | administrador | 204 sin cuerpo | 400, 401, 403, 404 |
 
 Errores: `{ "error": "mensaje" }`.
 
+### Composición con ms-habitaciones
+
+Todas las respuestas de `GET`, `POST` y `PUT` incluyen el objeto compuesto:
+`habitacion: { id, numero_habitacion, tipo }`.
+
+Si el microservicio proveedor (`ms-habitaciones`) no está disponible:
+- En `GET /reservas`, el objeto se devuelve como `null` y se agrega un campo `aviso` con el mensaje de error.
+- En `POST` y `PUT`, se responde con un error `503 Service Unavailable`.
+
 ### Ejemplo POST
 
-```json
 {
   "codigo": "RES-010",
   "huesped": "Ana Torres",
   "fecha_entrada": "2027-02-01",
   "fecha_salida": "2027-02-05",
-  "personas": 2
+  "personas": 2,
+  "habitacion_id": 3
 }
-```
 
 ## Pruebas
 
