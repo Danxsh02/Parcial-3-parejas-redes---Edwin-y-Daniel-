@@ -1,0 +1,13 @@
+[Unit]
+Description=Microservicio habitaciones (proveedor) - Examen Modulo 3
+After=network.target
+
+[Service]
+User=nodeapps
+Group=nodeapps
+WorkingDirectory=/srv/m3examen/app/ms-habitaciones
+ExecStart=/usr/bin/node --env-file=.env src/index.js
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
